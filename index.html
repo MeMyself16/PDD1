@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Disease Diagnoser 1.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+</head>
+<body>
+  <h1>Plant Disease Dignoser 1.0</h1>
+  <p>Upload an image of a plant to detect its disease.</p>
+
+  <!-- File input to upload plant image -->
+  <input type="file" id="imageUpload" accept="image/*">
+  <br>
+  <img id="uploadedImage" width="300" alt="Upload Image" />
+  <br>
+  <button id="predictButton">Predict Disease</button>
+
+  <h2>Prediction Result:</h2>
+  <p id="predictionResult"></p>
+
+  <script>
+    // Load the Teachable Machine model
+    let model, webcam, labelContainer, maxPredictions;
+
+    async function init() {
+      const URL = "./model"; // Path to your model's folder
+      const modelURL = URL + "/model.json";
+      const metadataURL = URL + "/metadata.json";
+
+      // Load the model and metadata
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+    }
+
+    // Predict the image when the user uploads it
+    async function predictImage() {
+      const image = document.getElementById("uploadedImage");
+      log.console(const prediction = await model.predict(image, false);
+      
+      let result = "Prediction: <br>";
+      prediction.forEach(p => {
+        result += `${p.className}: ${p.probability.toFixed(3)} <br>`;
+      });
+      document.getElementById("predictionResult").innerHTML = result;
+    }
+
+    // Handle image upload
+    document.getElementById("imageUpload").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("uploadedImage").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Handle predict button click
+    document.getElementById("predictButton").addEventListener("click", predictImage);
+
+    // Initialize model on page load
+    window.onload = init;
+  </script>
+</body>
+</html>
